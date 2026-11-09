@@ -1,0 +1,1083 @@
+<!DOCTYPE html>
+<html lang="vi" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cổng Thực Hành Thử Nghiệm 1: Nhật Ký JOMO & Bản Đồ Ưu Tiên Eisenhower</title>
+    
+    <!-- Chỉ dùng duy nhất Tailwind v3 chính thức (Xóa dòng 2.2.19 cũ đi để không bị xung đột mất màu nền) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        jomo: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- CSS CỨNG DỰ PHÒNG: Khóa cứng màu nền Header và Banner, đảm bảo mở ở đâu cũng không bao giờ mất nền -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc !important;
+            color: #1e293b;
+            margin: 0;
+        }
+
+        /* Khóa cứng nền màu tối của thanh Header trên cùng */
+        header.sticky {
+            background-color: rgba(15, 23, 42, 0.96) !important;
+            color: #94a3b8 !important;
+        }
+
+        /* Khóa cứng nền Gradient Tím Than của Hero Banner */
+        section.bg-gradient-to-br {
+            background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #0f172a 100%) !important;
+            color: #ffffff !important;
+        }
+
+        /* Khóa cứng màu khối trượt màu tím */
+        #nav-pill {
+            background-color: #4f46e5 !important;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+
+<body class="text-slate-800 antialiased selection:bg-emerald-500 selection:text-white">
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    <!-- THANH ĐẦU TRANG GHIM CỐ ĐỊNH (STICKY): Tích hợp 3-Stage Stepper luôn nổi trên cùng khi cuộn -->
+    <header
+        class="sticky top-0 z-50 bg-slate-900/95 backdrop-blur-md text-slate-400 py-3 px-4 sm:px-6 border-b border-slate-800 shadow-lg">
+        <div class="max-w-6xl mx-auto flex flex-col lg:flex-row items-start lg:items-center justify-between gap-3">
+            <!-- Cụm thông tin tiêu đề bên trái -->
+            <div>
+                <span class="text-xs font-bold uppercase tracking-wider text-emerald-400 block">Dự án nghiên cứu
+                    THPT</span>
+                <h1 class="font-bold text-white text-sm sm:text-base leading-tight mt-0.5">Cổng Thực Hành Giải pháp 1:
+                    Nhật Ký JOMO & Bản Đồ Ưu Tiên Eisenhower</h1>
+            </div>
+
+            <!-- 3-Stage Stepper Navigation (Có hiệu ứng nền tím trượt tự động) -->
+            <nav id="stepper-nav"
+                class="relative flex items-center gap-1 sm:gap-2 bg-slate-800/90 border border-slate-700 p-1.5 rounded-xl w-full lg:w-auto justify-between lg:justify-end overflow-x-auto">
+
+                <!-- Khối nền màu tím trượt mượt mà (Sliding Pill) -->
+                <div id="nav-pill"
+                    class="absolute top-1.5 bottom-1.5 left-0 bg-indigo-600 rounded-lg shadow-sm transition-all duration-300 ease-out pointer-events-none z-0">
+                </div>
+
+                <a href="#stage-1" data-target="stage-1"
+                    class="step-link relative z-10 flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium text-white transition-colors duration-300 whitespace-nowrap">
+                    <span
+                        class="step-badge w-5 h-5 rounded-full bg-white text-indigo-700 flex items-center justify-center text-xs font-bold transition-colors duration-300">1</span>
+                    <span>Thiết lập đầu tuần</span>
+                </a>
+
+                <i class="fa-solid fa-chevron-right text-slate-500 text-xs hidden sm:inline relative z-10"></i>
+
+                <a href="#stage-2" data-target="stage-2"
+                    class="step-link relative z-10 flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium text-slate-300 hover:text-white transition-colors duration-300 whitespace-nowrap">
+                    <span
+                        class="step-badge w-5 h-5 rounded-full bg-emerald-600 text-white flex items-center justify-center text-xs font-bold transition-colors duration-300">2</span>
+                    <span>Thực hành mỗi ngày</span>
+                </a>
+
+                <i class="fa-solid fa-chevron-right text-slate-500 text-xs hidden sm:inline relative z-10"></i>
+
+                <a href="#stage-3" data-target="stage-3"
+                    class="step-link relative z-10 flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium text-slate-300 hover:text-white transition-colors duration-300 whitespace-nowrap">
+                    <span
+                        class="step-badge w-5 h-5 rounded-full bg-amber-500 text-white flex items-center justify-center text-xs font-bold transition-colors duration-300">3</span>
+                    <span>Nhật ký JOMO tối</span>
+                </a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Banner (Đặt nút Điền Nhật Ký 21h30 và điều hướng phụ xuống đây) -->
+    <section
+        class="bg-gradient-to-br from-indigo-950 via-indigo-900 to-slate-900 text-white py-10 sm:py-14 px-4 sm:px-6 relative overflow-hidden">
+        <div
+            class="absolute inset-0 opacity-10 bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:20px_20px]">
+        </div>
+        <div class="max-w-6xl mx-auto relative z-10">
+            <div class="max-w-3xl">
+                <div
+                    class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 text-xs sm:text-sm font-medium mb-4">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    <span>Từ FOMO (Sợ bỏ lỡ) sang JOMO (Niềm vui khi biết từ bỏ)</span>
+                </div>
+                <h2 class="text-2xl sm:text-4xl font-extrabold tracking-tight leading-tight mb-4">
+                    Cổng Thực Hành Giải pháp 1: Nhật Ký JOMO & Bản Đồ Ưu Tiên Eisenhower
+                </h2>
+                <p class="text-indigo-100 text-sm sm:text-base leading-relaxed mb-6">
+                    Chào mừng bạn đến với không gian rèn luyện kỹ năng chọn lọc mục tiêu học tập cốt lõi. Tại đây, bạn
+                    sẽ học cách chủ động từ bỏ các trào lưu, nhóm chat hoặc sự kiện trực tuyến vô bổ để đầu tư thời gian
+                    cho sự bình yên và mục tiêu dài hạn của chính mình.
+                </p>
+
+                <!-- Cụm nút Điền Nhật Ký 21h30 & Điều hướng phụ (Đã đổi chỗ xuống đây) -->
+                <div class="flex flex-wrap items-center gap-4 mb-8">
+                    <a href="#stage-3"
+                        class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs sm:text-sm font-semibold px-4 py-2.5 rounded-xl transition shadow-md flex items-center gap-2">
+                        <i class="fa-solid fa-pen-to-square"></i>
+                        <span>Điền Nhật Ký 21h30 Ngay</span>
+                    </a>
+                    <div class="flex items-center gap-4 text-xs sm:text-sm text-indigo-200">
+                        <a href="#stage-1" class="hover:text-white underline-offset-4 hover:underline transition">Xem
+                            Giai đoạn 1</a>
+                        <span>•</span>
+                        <a href="#stage-2" class="hover:text-white underline-offset-4 hover:underline transition">Xem
+                            Giai đoạn 2</a>
+                    </div>
+                </div>
+
+                <!-- Quick Overview Cards -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 text-left">
+                    <div class="bg-white/10 backdrop-blur-sm border border-white/15 rounded-xl p-4">
+                        <div class="text-emerald-400 font-bold text-xs uppercase tracking-wider mb-1">Giai đoạn 1 • Tối
+                            Chủ Nhật</div>
+                        <div class="font-semibold text-base mb-1">Lập Bản Đồ Eisenhower</div>
+                        <p class="text-xs text-indigo-200">Dùng AI phân loại 10 việc trong tuần & thiết lập "Not-To-Do
+                            List" (15 phút).</p>
+                    </div>
+                    <div class="bg-white/10 backdrop-blur-sm border border-white/15 rounded-xl p-4">
+                        <div class="text-amber-300 font-bold text-xs uppercase tracking-wider mb-1">Giai đoạn 2 • 19h30
+                            - 21h30</div>
+                        <div class="font-semibold text-base mb-1">Tự Học & Chặn FOMO</div>
+                        <p class="text-xs text-indigo-200">Tắt thông báo, khóa web gây xao nhãng và bấm giờ Pomodoro tập
+                            trung sâu.</p>
+                    </div>
+                    <div class="bg-white/10 backdrop-blur-sm border border-white/15 rounded-xl p-4">
+                        <div class="text-pink-300 font-bold text-xs uppercase tracking-wider mb-1">Giai đoạn 3 • 21h30
+                            Mỗi Tối</div>
+                        <div class="font-semibold text-base mb-1">Ghi Nhật Ký JOMO</div>
+                        <p class="text-xs text-indigo-200">Dành 3 phút điền Google Form ghi nhận số phút tiết kiệm và
+                            cảm giác nhẹ nhõm.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content Container -->
+    <main class="max-w-6xl mx-auto px-4 sm:px-6 py-8 space-y-12">
+
+        <!-- ==========================================
+             GIAI ĐOẠN 1: THIẾT LẬP BẢN ĐỒ ĐẦU TUẦN
+             ========================================== -->
+        <section id="stage-1" class="scroll-mt-20 space-y-6">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 pb-4">
+                <div>
+                    <span
+                        class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-indigo-100 text-indigo-700 mb-2">
+                        <i class="fa-regular fa-calendar-check"></i> GIAI ĐOẠN 1: TỐI CHỦ NHẬT HÀNG TUẦN (15 PHÚT)
+                    </span>
+                    <h3 class="text-xl sm:text-2xl font-bold text-slate-900">Thiết Lập Bản Đồ Ưu Tiên Eisenhower &
+                        Not-To-Do List</h3>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                    <a href="https://ticktick.com/webapp/" target="_blank" rel="noopener noreferrer"
+                        class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-semibold text-xs sm:text-sm transition border border-indigo-200">
+                        <i class="fa-solid fa-table-cells-large"></i> Mở TickTick Web
+                    </a>
+                    <a href="https://www.proginosko.com/leechblock/" target="_blank" rel="noopener noreferrer"
+                        class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs sm:text-sm transition border border-slate-300">
+                        <i class="fa-solid fa-shield-halved"></i> Tải LeechBlock NG (Chặn Web)
+                    </a>
+                </div>
+            </div>
+
+            <!-- Step 1.1: AI Prompt Generator -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 sm:p-6">
+                <div class="flex items-start gap-3 mb-4">
+                    <div
+                        class="w-8 h-8 rounded-lg bg-indigo-600 text-white font-bold flex items-center justify-center shrink-0 text-sm">
+                        1.1</div>
+                    <div>
+                        <h4 class="font-bold text-slate-900 text-base sm:text-lg">Công cụ tạo câu lệnh AI (AI Prompting)
+                            phân loại việc tự động</h4>
+                        <p class="text-slate-600 text-xs sm:text-sm">Nhập danh sách các việc cần làm và thói quen giải
+                            trí trong tuần của bạn, hệ thống sẽ tạo sẵn câu lệnh chuẩn để bạn gửi cho ChatGPT hoặc
+                            Gemini.</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Input Side -->
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+                                Mục tiêu cốt lõi trong tuần của bạn:
+                            </label>
+                            <input type="text" id="ai-goal-input"
+                                value="Ôn thi học kỳ điểm cao, hoàn thành bài tập đúng hạn và đi ngủ trước 23h"
+                                class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
+                                oninput="updateAIPrompt()">
+                        </div>
+                        <div>
+                            <div class="flex items-center justify-between mb-1.5">
+                                <label class="block text-xs font-bold uppercase tracking-wider text-slate-700">
+                                    Danh sách ~10 việc cần làm & hoạt động thường ngày:
+                                </label>
+                                <button onclick="fillSampleTasks()"
+                                    class="text-xs text-indigo-600 hover:underline font-medium">Điền mẫu gợi ý</button>
+                            </div>
+                            <textarea id="ai-tasks-input" rows="5"
+                                class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
+                                oninput="updateAIPrompt()">1. Ôn thi học kỳ môn Toán và Ngữ Văn
+2. Hoàn thành bài tập tiếng Anh nộp ngày mai
+3. Đọc sách chuyên sâu 30 phút mỗi ngày
+4. Lướt TikTok và Reels giải trí buổi tối
+5. Trả lời tin nhắn nhóm chat lớp
+6. Tập thể dục 20 phút buổi chiều
+7. Hóng drama trên các fanpage Facebook
+8. Chơi game cùng bạn bè
+9. Lập kế hoạch tự học tuần tới
+10. Nghiên cứu đề tài khoa học của nhóm</textarea>
+                        </div>
+                    </div>
+
+                    <!-- Output Prompt Side -->
+                    <div
+                        class="flex flex-col justify-between bg-slate-900 text-slate-100 rounded-xl p-4 sm:p-5 border border-slate-800">
+                        <div>
+                            <div class="flex items-center justify-between border-b border-slate-800 pb-2.5 mb-3">
+                                <span class="text-xs font-semibold text-emerald-400 flex items-center gap-1.5">
+                                    <i class="fa-solid fa-wand-magic-sparkles"></i> Câu lệnh Prompt đã tạo sẵn cho bạn:
+                                </span>
+                                <span class="text-[11px] text-slate-400">Tự động cập nhật</span>
+                            </div>
+                            <pre id="ai-prompt-output"
+                                class="text-xs sm:text-sm text-slate-200 whitespace-pre-wrap font-mono leading-relaxed max-h-48 overflow-y-auto pr-1"></pre>
+                        </div>
+
+                        <div class="mt-4 pt-3 border-t border-slate-800 flex flex-wrap items-center gap-2.5">
+                            <button onclick="copyAIPrompt()"
+                                class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs sm:text-sm transition shadow-sm">
+                                <i class="fa-regular fa-copy"></i> 1. Sao chép Prompt
+                            </button>
+                            <a href="https://gemini.google.com/" target="_blank" rel="noopener noreferrer"
+                                class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs sm:text-sm transition">
+                                <i class="fa-solid fa-bolt"></i> 2. Mở Google Gemini
+                            </a>
+                            <a href="https://chatgpt.com/" target="_blank" rel="noopener noreferrer"
+                                class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-slate-700 hover:bg-slate-600 text-white font-semibold text-xs sm:text-sm transition">
+                                <i class="fa-solid fa-robot"></i> Mở ChatGPT
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 1.2: Interactive 4-Quadrant Eisenhower Matrix -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 sm:p-6">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                    <div class="flex items-start gap-3">
+                        <div
+                            class="w-8 h-8 rounded-lg bg-indigo-600 text-white font-bold flex items-center justify-center shrink-0 text-sm">
+                            1.2</div>
+                        <div>
+                            <h4 class="font-bold text-slate-900 text-base sm:text-lg">Bản đồ ưu tiên Eisenhower & Danh
+                                sách KHÔNG làm (Not-To-Do List)</h4>
+                            <p class="text-slate-600 text-xs sm:text-sm">Điền các nhiệm vụ vào 4 ô dưới đây để phân định
+                                rõ việc đáng làm và việc cần loại bỏ. Dữ liệu được <strong>tự động lưu</strong> trên
+                                trình duyệt của bạn.</p>
+                        </div>
+                    </div>
+                    <button onclick="resetMatrixToDefault()"
+                        class="self-start sm:self-center inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-slate-600 hover:text-red-600 bg-slate-100 hover:bg-red-50 transition">
+                        <i class="fa-solid fa-rotate-left"></i> Khôi phục mẫu gốc
+                    </button>
+                </div>
+
+                <!-- 4 Quadrants Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+
+                    <!-- Quadrant 1: Urgent & Important -->
+                    <div class="rounded-2xl border-2 border-rose-200 bg-rose-50/40 p-4 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between mb-2">
+                                <span
+                                    class="px-2.5 py-1 rounded-md bg-rose-600 text-white font-bold text-xs uppercase tracking-wide">
+                                    Ô 1: KHẨN CẤP & QUAN TRỌNG
+                                </span>
+                                <span class="text-xs font-bold text-rose-700"><i class="fa-solid fa-bolt mr-1"></i>LÀM
+                                    NGAY</span>
+                            </div>
+                            <p class="text-xs text-slate-600 mb-3">Các nhiệm vụ học tập cốt lõi đến hạn hoặc ảnh hưởng
+                                trực tiếp đến kết quả.</p>
+                            <ul id="list-q1" class="space-y-2 mb-4"></ul>
+                        </div>
+                        <form onsubmit="addTask(event, 'q1')" class="flex gap-2 mt-2">
+                            <input type="text" id="input-q1" placeholder="Thêm việc cần làm ngay..." required
+                                class="flex-1 px-3 py-2 rounded-xl border border-rose-200 bg-white text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-rose-500">
+                            <button type="submit"
+                                class="px-3.5 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-semibold text-xs sm:text-sm transition">
+                                <i class="fa-solid fa-plus"></i> Thêm
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Quadrant 2: Not Urgent & Important -->
+                    <div
+                        class="rounded-2xl border-2 border-indigo-200 bg-indigo-50/40 p-4 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between mb-2">
+                                <span
+                                    class="px-2.5 py-1 rounded-md bg-indigo-600 text-white font-bold text-xs uppercase tracking-wide">
+                                    Ô 2: KHÔNG KHẨN CẤP nhưng QUAN TRỌNG
+                                </span>
+                                <span class="text-xs font-bold text-indigo-700"><i
+                                        class="fa-regular fa-calendar mr-1"></i>LÊN LỊCH</span>
+                            </div>
+                            <p class="text-xs text-slate-600 mb-3">Mục tiêu cá nhân dài hạn giúp phát triển bản thân bền
+                                vững.</p>
+                            <ul id="list-q2" class="space-y-2 mb-4"></ul>
+                        </div>
+                        <form onsubmit="addTask(event, 'q2')" class="flex gap-2 mt-2">
+                            <input type="text" id="input-q2" placeholder="Thêm mục tiêu dài hạn..." required
+                                class="flex-1 px-3 py-2 rounded-xl border border-indigo-200 bg-white text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            <button type="submit"
+                                class="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs sm:text-sm transition">
+                                <i class="fa-solid fa-plus"></i> Thêm
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Quadrant 3: Urgent & Not Important -->
+                    <div class="rounded-2xl border-2 border-amber-200 bg-amber-50/40 p-4 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between mb-2">
+                                <span
+                                    class="px-2.5 py-1 rounded-md bg-amber-600 text-white font-bold text-xs uppercase tracking-wide">
+                                    Ô 3: KHÔNG QUAN TRỌNG (Gây xao nhãng)
+                                </span>
+                                <span class="text-xs font-bold text-amber-800"><i
+                                        class="fa-solid fa-compress mr-1"></i>GIẢM BỚT</span>
+                            </div>
+                            <p class="text-xs text-slate-600 mb-3">Những thông báo tức thời tạo cảm giác khẩn cấp giả
+                                tạo (FOMO nhẹ).</p>
+                            <ul id="list-q3" class="space-y-2 mb-4"></ul>
+                        </div>
+                        <form onsubmit="addTask(event, 'q3')" class="flex gap-2 mt-2">
+                            <input type="text" id="input-q3" placeholder="Thêm việc cần giảm bớt..." required
+                                class="flex-1 px-3 py-2 rounded-xl border border-amber-200 bg-white text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-amber-500">
+                            <button type="submit"
+                                class="px-3.5 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-semibold text-xs sm:text-sm transition">
+                                <i class="fa-solid fa-plus"></i> Thêm
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Quadrant 4: Not-To-Do List (JOMO Core) -->
+                    <div
+                        class="rounded-2xl border-2 border-emerald-300 bg-emerald-50/50 p-4 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between mb-2">
+                                <span
+                                    class="px-2.5 py-1 rounded-md bg-emerald-700 text-white font-bold text-xs uppercase tracking-wide">
+                                    Ô 4: LOẠI BỎ / NOT-TO-DO LIST
+                                </span>
+                                <span class="text-xs font-bold text-emerald-800"><i class="fa-solid fa-ban mr-1"></i>CHỦ
+                                    ĐỘNG TỪ BỎ (JOMO)</span>
+                            </div>
+                            <p class="text-xs text-slate-600 mb-3">Các trào lưu, "drama", thói quen vô bổ cần chủ động
+                                từ chối để tiết kiệm thời gian.</p>
+                            <ul id="list-q4" class="space-y-2 mb-4"></ul>
+                        </div>
+                        <form onsubmit="addTask(event, 'q4')" class="flex gap-2 mt-2">
+                            <input type="text" id="input-q4" placeholder="Thêm cám dỗ FOMO cần từ bỏ..." required
+                                class="flex-1 px-3 py-2 rounded-xl border border-emerald-300 bg-white text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-emerald-600">
+                            <button type="submit"
+                                class="px-3.5 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-semibold text-xs sm:text-sm transition">
+                                <i class="fa-solid fa-plus"></i> Thêm
+                            </button>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- ==========================================
+             GIAI ĐOẠN 2: THỰC HÀNH TỰ HỌC & CHẶN FOMO
+             ========================================== -->
+        <section id="stage-2" class="scroll-mt-20 space-y-6">
+            <div class="border-b border-slate-200 pb-4">
+                <span
+                    class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 mb-2">
+                    <i class="fa-solid fa-stopwatch"></i> GIAI ĐOẠN 2: THỰC HÀNH HÀNG NGÀY (19H30 - 21H30)
+                </span>
+                <h3 class="text-xl sm:text-2xl font-bold text-slate-900">Không Gian Tập Trung JOMO & Quy Trình Chặn FOMO
+                </h3>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+                <!-- Left Column: Pre-study Checklist -->
+                <div
+                    class="lg:col-span-5 bg-white rounded-2xl shadow-sm border border-slate-200 p-5 sm:p-6 flex flex-col justify-between">
+                    <div>
+                        <h4 class="font-bold text-slate-900 text-base sm:text-lg mb-1 flex items-center gap-2">
+                            <i class="fa-solid fa-list-check text-emerald-600"></i>
+                            Checklist Kích Hoạt JOMO Trước Giờ Học
+                        </h4>
+                        <p class="text-xs sm:text-sm text-slate-600 mb-4">Hoàn thành 4 bước dưới đây trước khi bấm đồng
+                            hồ học để cách ly hoàn toàn khỏi FOMO:</p>
+
+                        <div class="space-y-3">
+                            <label
+                                class="flex items-start gap-3 p-3 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer transition">
+                                <input type="checkbox"
+                                    class="mt-1 w-4 h-4 text-emerald-600 rounded focus:ring-emerald-500 pre-study-check"
+                                    onchange="updateChecklistProgress()">
+                                <span class="text-xs sm:text-sm text-slate-800">
+                                    <strong>1. Chọn mục tiêu cốt lõi:</strong> Đã nhìn vào <strong>Ô 1 & Ô 2</strong>
+                                    trên Bản đồ Eisenhower để biết chính xác tối nay cần hoàn thành bài nào.
+                                </span>
+                            </label>
+                            <label
+                                class="flex items-start gap-3 p-3 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer transition">
+                                <input type="checkbox"
+                                    class="mt-1 w-4 h-4 text-emerald-600 rounded focus:ring-emerald-500 pre-study-check"
+                                    onchange="updateChecklistProgress()">
+                                <span class="text-xs sm:text-sm text-slate-800">
+                                    <strong>2. Tắt thông báo nhóm chat:</strong> Đã bật chế độ <em>Không làm phiền (Do
+                                        Not Disturb)</em> hoặc tắt thông báo các nhóm chat lớp không liên quan.
+                                </span>
+                            </label>
+                            <label
+                                class="flex items-start gap-3 p-3 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer transition">
+                                <input type="checkbox"
+                                    class="mt-1 w-4 h-4 text-emerald-600 rounded focus:ring-emerald-500 pre-study-check"
+                                    onchange="updateChecklistProgress()">
+                                <span class="text-xs sm:text-sm text-slate-800">
+                                    <strong>3. Khóa Not-To-Do List:</strong> Đã đóng toàn bộ tab Facebook, TikTok, Reels
+                                    hoặc bật tiện ích chặn web LeechBlock NG.
+                                </span>
+                            </label>
+                            <label
+                                class="flex items-start gap-3 p-3 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer transition">
+                                <input type="checkbox"
+                                    class="mt-1 w-4 h-4 text-emerald-600 rounded focus:ring-emerald-500 pre-study-check"
+                                    onchange="updateChecklistProgress()">
+                                <span class="text-xs sm:text-sm text-slate-800">
+                                    <strong>4. Tâm thế JOMO:</strong> Chấp nhận bỏ qua mọi tin tức mạng xã hội trong 2
+                                    giờ tới với cảm giác thư thái, không lo âu.
+                                </span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div id="checklist-status"
+                        class="mt-5 p-3.5 rounded-xl bg-slate-100 text-slate-700 text-xs sm:text-sm font-medium flex items-center justify-between">
+                        <span>Tiến độ sẵn sàng: <strong id="check-count">0/4</strong> bước</span>
+                        <span class="text-xs text-slate-500">Hãy tích đủ trước khi học</span>
+                    </div>
+                </div>
+
+                <!-- Right Column: Interactive Pomodoro & Saved Minutes Counter -->
+                <div
+                    class="lg:col-span-7 bg-gradient-to-br from-slate-900 to-indigo-950 text-white rounded-2xl shadow-sm p-6 sm:p-8 flex flex-col justify-between relative overflow-hidden">
+                    <div class="flex flex-wrap items-center justify-between gap-2 border-b border-white/10 pb-4">
+                        <div>
+                            <span class="text-xs font-bold uppercase tracking-wider text-emerald-400 block">Đồng Hồ Tập
+                                Trung Pomodoro</span>
+                            <h4 class="text-lg font-bold" id="timer-mode-title">Phiên Tập Trung Sâu (25 phút)</h4>
+                        </div>
+                        <div class="flex gap-1.5 bg-white/10 p-1 rounded-xl">
+                            <button onclick="setTimerMode(25, 'Phiên Tập Trung Sâu (25 phút)')"
+                                class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-500 text-white transition"
+                                id="btn-mode-25">25p Học</button>
+                            <button onclick="setTimerMode(45, 'Phiên Tập Trung Cao Độ (45 phút)')"
+                                class="px-3 py-1.5 rounded-lg text-xs font-semibold text-indigo-200 hover:bg-white/10 transition"
+                                id="btn-mode-45">45p Học</button>
+                            <button onclick="setTimerMode(5, 'Giải Lao Không Mạng Xã Hội (5 phút)')"
+                                class="px-3 py-1.5 rounded-lg text-xs font-semibold text-indigo-200 hover:bg-white/10 transition"
+                                id="btn-mode-5">5p Nghỉ</button>
+                        </div>
+                    </div>
+
+                    <!-- Big Timer Display -->
+                    <div class="my-8 text-center">
+                        <div id="timer-display"
+                            class="text-6xl sm:text-7xl font-extrabold tracking-tight font-mono text-white drop-shadow">
+                            25:00
+                        </div>
+                        <p id="timer-subtext" class="text-xs sm:text-sm text-indigo-200 mt-2">
+                            Mỗi phút đồng hồ chạy là một phút bạn chiến thắng FOMO!
+                        </p>
+
+                        <!-- Timer Controls -->
+                        <div class="flex items-center justify-center gap-3 mt-6">
+                            <button id="btn-start-timer" onclick="toggleTimer()"
+                                class="px-6 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-sm sm:text-base transition flex items-center gap-2 shadow-lg shadow-emerald-500/20">
+                                <i class="fa-solid fa-play"></i> <span>Bắt đầu tập trung</span>
+                            </button>
+                            <button onclick="resetTimer()"
+                                class="px-4 py-3 rounded-xl bg-white/10 hover:bg-white/20 text-white font-semibold text-sm transition flex items-center gap-1.5">
+                                <i class="fa-solid fa-rotate-right"></i> Đặt lại
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Saved Time Counter Box (Helps answer Question 5 in Google Form) -->
+                    <div
+                        class="bg-white/10 backdrop-blur-sm border border-white/15 rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <div class="flex items-center gap-3">
+                            <div
+                                class="w-11 h-11 rounded-xl bg-emerald-500/20 border border-emerald-400/30 flex items-center justify-center text-emerald-300 text-xl shrink-0">
+                                <i class="fa-solid fa-piggy-bank"></i>
+                            </div>
+                            <div>
+                                <div class="text-xs text-indigo-200">Số phút tiết kiệm được hôm nay (Dùng để điền Câu 5
+                                    Form tối):</div>
+                                <div class="text-xl sm:text-2xl font-extrabold text-emerald-400"><span
+                                        id="saved-minutes-count">0</span> phút</div>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+                            <button onclick="addSavedMinutes(15)"
+                                class="px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-xs font-semibold transition"
+                                title="Cộng thêm 15 phút bạn đã tự từ chối lướt mạng">+15p tự giác</button>
+                            <button onclick="resetSavedMinutes()"
+                                class="px-2.5 py-1.5 rounded-lg text-xs text-rose-300 hover:bg-rose-500/20 transition"
+                                title="Đặt lại về 0">Xóa</button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ==========================================
+             GIAI ĐOẠN 3: GHI NHẬT KÝ JOMO CUỐI NGÀY (GOOGLE FORM)
+             ========================================== -->
+        <section id="stage-3" class="scroll-mt-20 space-y-6 pb-12">
+            <div class="border-b border-slate-200 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div>
+                    <span
+                        class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 mb-2">
+                        <i class="fa-solid fa-pen-to-square"></i> GIAI ĐOẠN 3: 21H30 MỖI TỐI TRƯỚC KHI NGỦ (3 PHÚT)
+                    </span>
+                    <h3 class="text-xl sm:text-2xl font-bold text-slate-900">Báo Cáo "Nhật Ký JOMO" Hàng Ngày</h3>
+                </div>
+                <a href="https://docs.google.com/forms/d/e/1FAIpQLSer-So9nXjeMl5buLFfyt6ioPXiS2qwF7tfws0Mqc0LgVZCUA/viewform"
+                    target="_blank" rel="noopener noreferrer"
+                    class="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-emerald-600 hover:from-indigo-700 hover:to-emerald-700 text-white font-bold text-sm shadow-md transition">
+                    <i class="fa-solid fa-up-right-from-square"></i> Mở Google Form Trong Tab Mới
+                </a>
+            </div>
+
+            <!-- Summary Guide & Embedded Google Form -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+                <!-- 5 Quick Reflection Questions Preview -->
+                <div class="lg:col-span-4 bg-white rounded-2xl shadow-sm border border-slate-200 p-5 sm:p-6 space-y-4">
+                    <div class="inline-flex items-center gap-2 text-indigo-700 font-bold text-sm">
+                        <i class="fa-solid fa-circle-info"></i> Hướng dẫn điền nhanh (3 phút)
+                    </div>
+                    <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                        Mỗi tối lúc <strong>21h30</strong>, bạn hãy điền biểu mẫu bên cạnh (hoặc bấm nút mở tab mới) để
+                        nhóm nghiên cứu ghi nhận tiến bộ của bạn:
+                    </p>
+
+                    <div class="space-y-3 text-xs sm:text-sm">
+                        <div class="p-3 rounded-xl bg-slate-50 border border-slate-200/80">
+                            <strong class="text-slate-900 block mb-0.5">1. Hoạt động đã từ chối hôm nay:</strong>
+                            <span class="text-slate-600">Tắt thông báo chat lớp, không lướt TikTok quá 30p, bỏ qua
+                                drama...</span>
+                        </div>
+                        <div class="p-3 rounded-xl bg-slate-50 border border-slate-200/80">
+                            <strong class="text-slate-900 block mb-0.5">2. Cảm giác của bạn:</strong>
+                            <span class="text-slate-600">Nhận diện sự chuyển biến từ "hơi bứt rứt nhẹ ban đầu" sang "tập
+                                trung và nhẹ nhõm".</span>
+                        </div>
+                        <div class="p-3 rounded-xl bg-emerald-50 border border-emerald-200">
+                            <strong class="text-emerald-950 block mb-0.5">3. Thời gian tiết kiệm được (phút):</strong>
+                            <span class="text-emerald-800">Hôm nay đồng hồ của bạn đã ghi nhận: <strong
+                                    id="form-preview-minutes">0</strong> phút (Chỉ điền số vào Form).</span>
+                        </div>
+                        <div class="p-3 rounded-xl bg-slate-50 border border-slate-200/80">
+                            <strong class="text-slate-900 block mb-0.5">4. Việc ý nghĩa đã làm thay thế:</strong>
+                            <span class="text-slate-600">Các nhiệm vụ thuộc Ô 1 & Ô 2 bạn đã hoàn thành nhờ số phút tiết
+                                kiệm được.</span>
+                        </div>
+                        <div class="p-3 rounded-xl bg-amber-50 border border-amber-200">
+                            <strong class="text-amber-950 block mb-0.5">5. Điểm số JOMO (1 - 5 Sao):</strong>
+                            <span class="text-amber-800">Tự đánh giá mức độ làm chủ thời gian và sự thư thái tối nay của
+                                bạn.</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Embedded Official Google Form -->
+                <div class="lg:col-span-8 bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                    <div class="bg-slate-100 px-5 py-3 border-b border-slate-200 flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <span class="w-3 h-3 rounded-full bg-rose-400"></span>
+                            <span class="w-3 h-3 rounded-full bg-amber-400"></span>
+                            <span class="w-3 h-3 rounded-full bg-emerald-400"></span>
+                            <span class="text-xs font-semibold text-slate-700 ml-2">Biểu mẫu Nhật Ký JOMO Chính Thức
+                                (Điền trực tiếp bên dưới)</span>
+                        </div>
+                        <a href="https://docs.google.com/forms/d/e/1FAIpQLSer-So9nXjeMl5buLFfyt6ioPXiS2qwF7tfws0Mqc0LgVZCUA/viewform"
+                            target="_blank" rel="noopener noreferrer"
+                            class="text-xs font-bold text-indigo-600 hover:underline">
+                            Mở toàn màn hình <i class="fa-solid fa-arrow-up-right-from-square ml-1"></i>
+                        </a>
+                    </div>
+                    <div class="w-full bg-slate-50">
+                        <iframe
+                            src="https://docs.google.com/forms/d/e/1FAIpQLSer-So9nXjeMl5buLFfyt6ioPXiS2qwF7tfws0Mqc0LgVZCUA/viewform?embedded=true"
+                            class="w-full h-[720px] border-0" title="Biểu mẫu Nhật ký JOMO 3 phút hàng ngày">
+                            Đang tải biểu mẫu Google Form...
+                        </iframe>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+
+    <!-- Application JavaScript -->
+    <script>
+        // =====================================================
+        // 1. TOAST NOTIFICATION HELPER (No alert/confirm used)
+        // =====================================================
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            const bgClass = type === 'success' ? 'bg-slate-900 border-emerald-500 text-white' : 'bg-indigo-950 border-indigo-400 text-white';
+            const iconClass = type === 'success' ? 'fa-circle-check text-emerald-400' : 'fa-circle-info text-indigo-400';
+
+            toast.className = `pointer-events-auto flex items-center gap-2.5 px-4 py-3 rounded-xl shadow-lg border-l-4 ${bgClass} text-xs sm:text-sm font-medium transition-all duration-300 transform translate-y-2 opacity-0`;
+            toast.innerHTML = `<i class="fa-solid ${iconClass} text-base"></i><span>${message}</span>`;
+            container.appendChild(toast);
+
+            requestAnimationFrame(() => {
+                toast.classList.remove('translate-y-2', 'opacity-0');
+            });
+
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-2');
+                setTimeout(() => toast.remove(), 300);
+            }, 3200);
+        }
+
+        // =====================================================
+        // 2. STAGE 1.1: AI PROMPT GENERATOR
+        // =====================================================
+        function updateAIPrompt() {
+            const goal = document.getElementById('ai-goal-input').value.trim();
+            const tasks = document.getElementById('ai-tasks-input').value.trim();
+            const promptText = `Đóng vai cố vấn quản lý thời gian cho học sinh THPT. Tuần này mục tiêu cốt lõi của tôi là: "${goal}".\n\nDưới đây là danh sách các việc cần làm và thói quen của tôi trong tuần:\n${tasks}\n\nHãy giúp tôi:\n1. Phân loại toàn bộ các việc trên vào đúng 4 ô của Ma trận Eisenhower:\n   - Ô 1 (Khẩn cấp & Quan trọng - Làm ngay)\n   - Ô 2 (Không khẩn cấp nhưng Quan trọng - Lên lịch)\n   - Ô 3 (Không quan trọng - Giảm bớt)\n   - Ô 4 (Không quan trọng - Loại bỏ vào Not-To-Do List)\n2. Chỉ rõ 3 hoạt động gây FOMO vô bổ nhất để tôi cam kết từ bỏ (JOMO).\n3. Gợi ý lịch trình tự học buổi tối từ 19h30 đến 21h30 tối ưu nhất.`;
+
+            document.getElementById('ai-prompt-output').textContent = promptText;
+        }
+
+        function fillSampleTasks() {
+            document.getElementById('ai-tasks-input').value = `1. Ôn thi học kỳ môn Toán và Ngữ Văn\n2. Hoàn thành bài tập tiếng Anh nộp ngày mai\n3. Đọc sách chuyên sâu 30 phút mỗi ngày\n4. Lướt TikTok và Reels giải trí buổi tối\n5. Trả lời tin nhắn nhóm chat lớp\n6. Tập thể dục 20 phút buổi chiều\n7. Hóng drama trên các fanpage Facebook\n8. Chơi game cùng bạn bè\n9. Lập kế hoạch tự học tuần tới\n10. Nghiên cứu đề tài khoa học của nhóm`;
+            updateAIPrompt();
+            showToast('Đã điền danh sách 10 việc mẫu!');
+        }
+
+        function copyAIPrompt() {
+            const promptText = document.getElementById('ai-prompt-output').textContent;
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = promptText;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempTextArea);
+            showToast('Đã sao chép câu lệnh Prompt! Hãy dán vào Gemini hoặc ChatGPT.');
+        }
+
+        // =====================================================
+        // 3. STAGE 1.2: EISENHOWER MATRIX WITH LOCALSTORAGE
+        // =====================================================
+        const DEFAULT_MATRIX = {
+            q1: [
+                { id: 101, text: 'Ôn thi học kỳ môn chính', done: false },
+                { id: 102, text: 'Hoàn thành bài tập nộp ngày mai', done: false },
+                { id: 103, text: 'Xử lý vấn đề sức khỏe', done: false }
+            ],
+            q2: [
+                { id: 201, text: 'Đọc sách chuyên sâu, luyện ngoại ngữ', done: false },
+                { id: 202, text: 'Lập kế hoạch tuần, tập thể dục', done: false },
+                { id: 203, text: 'Nghiên cứu đề tài khoa học', done: false }
+            ],
+            q3: [
+                { id: 301, text: 'Trả lời các tin nhắn nhóm chat lớp không liên quan', done: false },
+                { id: 302, text: 'Lướt các thông báo mạng xã hội tức thời', done: false }
+            ],
+            q4: [
+                { id: 401, text: 'Lướt TikTok/Reels vô định quá 30 phút', done: false },
+                { id: 402, text: 'Hóng "drama" trực tuyến', done: false },
+                { id: 403, text: 'Chơi game liên tục không giới hạn', done: false }
+            ]
+        };
+
+        let matrixData = {};
+
+        function loadMatrix() {
+            const saved = localStorage.getItem('jomo_eisenhower_matrix_v1');
+            if (saved) {
+                try {
+                    matrixData = JSON.parse(saved);
+                } catch (e) {
+                    matrixData = JSON.parse(JSON.stringify(DEFAULT_MATRIX));
+                }
+            } else {
+                matrixData = JSON.parse(JSON.stringify(DEFAULT_MATRIX));
+            }
+            renderMatrix();
+        }
+
+        function saveMatrix() {
+            localStorage.setItem('jomo_eisenhower_matrix_v1', JSON.stringify(matrixData));
+        }
+
+        function renderMatrix() {
+            ['q1', 'q2', 'q3', 'q4'].forEach(q => {
+                const listEl = document.getElementById(`list-${q}`);
+                listEl.innerHTML = '';
+                matrixData[q].forEach(item => {
+                    const li = document.createElement('li');
+                    li.className = 'flex items-center justify-between gap-2 bg-white/90 px-3 py-2 rounded-xl border border-slate-200/80 shadow-sm text-xs sm:text-sm';
+
+                    const checkLabel = q === 'q4' ? 'Đã từ bỏ hôm nay' : 'Hoàn thành';
+                    li.innerHTML = `
+                        <label class="flex items-center gap-2.5 cursor-pointer flex-1">
+                            <input type="checkbox" ${item.done ? 'checked' : ''} onchange="toggleTask('${q}', ${item.id})"
+                                class="w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500">
+                            <span class="${item.done ? 'line-through text-slate-400' : 'text-slate-800 font-medium'}">${escapeHtml(item.text)}</span>
+                        </label>
+                        <button onclick="deleteTask('${q}', ${item.id})" class="text-slate-400 hover:text-rose-600 px-1.5 py-0.5 transition" title="Xóa mục này">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    `;
+                    listEl.appendChild(li);
+                });
+            });
+        }
+
+        function addTask(event, quadrant) {
+            event.preventDefault();
+            const inputEl = document.getElementById(`input-${quadrant}`);
+            const text = inputEl.value.trim();
+            if (!text) return;
+
+            matrixData[quadrant].push({
+                id: Date.now(),
+                text: text,
+                done: false
+            });
+            inputEl.value = '';
+            saveMatrix();
+            renderMatrix();
+            showToast('Đã thêm vào Bản đồ ưu tiên!');
+        }
+
+        function toggleTask(quadrant, id) {
+            const item = matrixData[quadrant].find(t => t.id === id);
+            if (item) {
+                item.done = !item.done;
+                saveMatrix();
+                renderMatrix();
+            }
+        }
+
+        function deleteTask(quadrant, id) {
+            matrixData[quadrant] = matrixData[quadrant].filter(t => t.id !== id);
+            saveMatrix();
+            renderMatrix();
+        }
+
+        function resetMatrixToDefault() {
+            matrixData = JSON.parse(JSON.stringify(DEFAULT_MATRIX));
+            saveMatrix();
+            renderMatrix();
+            showToast('Đã khôi phục Bản đồ Eisenhower về mẫu chuẩn của đề tài!', 'info');
+        }
+
+        function escapeHtml(str) {
+            return str.replace(/[&<>"']/g, function (m) {
+                return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[m];
+            });
+        }
+
+        // =====================================================
+        // 4. STAGE 2: CHECKLIST & POMODORO JOMO TIMER
+        // =====================================================
+        function updateChecklistProgress() {
+            const checks = document.querySelectorAll('.pre-study-check');
+            let count = 0;
+            checks.forEach(c => { if (c.checked) count++; });
+            document.getElementById('check-count').textContent = `${count}/4`;
+
+            const statusBox = document.getElementById('checklist-status');
+            if (count === 4) {
+                statusBox.className = 'mt-5 p-3.5 rounded-xl bg-emerald-100 text-emerald-900 text-xs sm:text-sm font-semibold flex items-center justify-between border border-emerald-300';
+                statusBox.innerHTML = `<span><i class="fa-solid fa-circle-check text-emerald-600 mr-1.5"></i>Đã sẵn sàng 4/4 bước!</span><span>Hãy bấm đồng hồ bắt đầu học</span>`;
+                showToast('Tuyệt vời! Bạn đã sẵn sàng bước vào phiên tự học không FOMO.');
+            } else {
+                statusBox.className = 'mt-5 p-3.5 rounded-xl bg-slate-100 text-slate-700 text-xs sm:text-sm font-medium flex items-center justify-between';
+                statusBox.innerHTML = `<span>Tiến độ sẵn sàng: <strong id="check-count">${count}/4</strong> bước</span><span class="text-xs text-slate-500">Hãy tích đủ trước khi học</span>`;
+            }
+        }
+
+        let timerDurationMinutes = 25;
+        let remainingSeconds = 25 * 60;
+        let timerInterval = null;
+        let isRunning = false;
+        let elapsedSecondsForSaving = 0;
+
+        function setTimerMode(minutes, title) {
+            pauseTimer();
+            timerDurationMinutes = minutes;
+            remainingSeconds = minutes * 60;
+            document.getElementById('timer-mode-title').textContent = title;
+            updateTimerDisplay();
+
+            // Highlight active mode button
+            [25, 45, 5].forEach(m => {
+                const btn = document.getElementById(`btn-mode-${m}`);
+                if (m === minutes) {
+                    btn.className = 'px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-500 text-white transition';
+                } else {
+                    btn.className = 'px-3 py-1.5 rounded-lg text-xs font-semibold text-indigo-200 hover:bg-white/10 transition';
+                }
+            });
+        }
+
+        function updateTimerDisplay() {
+            const mins = Math.floor(remainingSeconds / 60);
+            const secs = remainingSeconds % 60;
+            document.getElementById('timer-display').textContent =
+                `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+        }
+
+        function toggleTimer() {
+            if (isRunning) {
+                pauseTimer();
+            } else {
+                startTimer();
+            }
+        }
+
+        function startTimer() {
+            isRunning = true;
+            const btn = document.getElementById('btn-start-timer');
+            btn.innerHTML = `<i class="fa-solid fa-pause"></i> <span>Tạm dừng</span>`;
+            btn.className = 'px-6 py-3 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold text-sm sm:text-base transition flex items-center gap-2 shadow-lg';
+
+            timerInterval = setInterval(() => {
+                if (remainingSeconds > 0) {
+                    remainingSeconds--;
+                    elapsedSecondsForSaving++;
+
+                    // Every 60 seconds of focus in 25m or 45m mode, automatically add 1 saved minute
+                    if (timerDurationMinutes >= 25 && elapsedSecondsForSaving % 60 === 0) {
+                        addSavedMinutes(1, true);
+                    }
+                    updateTimerDisplay();
+                } else {
+                    completeTimerSession();
+                }
+            }, 1000);
+        }
+
+        function pauseTimer() {
+            isRunning = false;
+            clearInterval(timerInterval);
+            const btn = document.getElementById('btn-start-timer');
+            btn.innerHTML = `<i class="fa-solid fa-play"></i> <span>Tiếp tục tập trung</span>`;
+            btn.className = 'px-6 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-sm sm:text-base transition flex items-center gap-2 shadow-lg shadow-emerald-500/20';
+        }
+
+        function resetTimer() {
+            pauseTimer();
+            remainingSeconds = timerDurationMinutes * 60;
+            elapsedSecondsForSaving = 0;
+            updateTimerDisplay();
+            document.getElementById('btn-start-timer').innerHTML = `<i class="fa-solid fa-play"></i> <span>Bắt đầu tập trung</span>`;
+        }
+
+        function completeTimerSession() {
+            pauseTimer();
+            playBeepSound();
+            showToast(`Chúc mừng! Bạn đã hoàn thành ${timerDurationMinutes} phút tập trung JOMO!`);
+            resetTimer();
+        }
+
+        function playBeepSound() {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(587.33, ctx.currentTime); // D5
+                gain.gain.setValueAtTime(0.15, ctx.currentTime);
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start();
+                setTimeout(() => osc.stop(), 400);
+            } catch (e) { }
+        }
+
+        // Saved Minutes Tracking (LocalStorage)
+        function loadSavedMinutes() {
+            const saved = parseInt(localStorage.getItem('jomo_saved_minutes_today') || '0', 10);
+            updateSavedMinutesUI(saved);
+        }
+
+        function addSavedMinutes(mins, silent = false) {
+            const current = parseInt(localStorage.getItem('jomo_saved_minutes_today') || '0', 10);
+            const updated = current + mins;
+            localStorage.setItem('jomo_saved_minutes_today', String(updated));
+            updateSavedMinutesUI(updated);
+            if (!silent) {
+                showToast(`Đã cộng thêm ${mins} phút tiết kiệm được hôm nay!`);
+            }
+        }
+
+        function resetSavedMinutes() {
+            localStorage.setItem('jomo_saved_minutes_today', '0');
+            updateSavedMinutesUI(0);
+            showToast('Đã đặt lại bộ đếm số phút tiết kiệm hôm nay về 0.', 'info');
+        }
+
+        function updateSavedMinutesUI(val) {
+            document.getElementById('saved-minutes-count').textContent = val;
+            document.getElementById('form-preview-minutes').textContent = val;
+        }
+
+        // Initialize on page load
+        window.onload = function () {
+            updateAIPrompt();
+            loadMatrix();
+            loadSavedMinutes();
+        };
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const navPill = document.getElementById('nav-pill');
+            const stepLinks = document.querySelectorAll('.step-link');
+            const stages = ['stage-1', 'stage-2', 'stage-3'];
+
+            let isClickScrolling = false; // Khóa chống giật khi bấm chuyển tab
+            let scrollTimeout = null;
+            let currentActiveId = null;
+
+            // Hàm di chuyển khối nền tím đến đúng vị trí tab đang chọn
+            function movePillTo(activeLink) {
+                if (!activeLink || !navPill) return;
+
+                const targetId = activeLink.getAttribute('data-target');
+                // Nếu đang ở đúng mục đó rồi thì không vẽ lại để tránh nhấp nháy
+                if (currentActiveId === targetId && navPill.style.width) return;
+                currentActiveId = targetId;
+
+                // Dùng transform thay cho left để chuyển động mượt 60fps không bị khựng
+                navPill.style.width = `${activeLink.offsetWidth}px`;
+                navPill.style.transform = `translateX(${activeLink.offsetLeft}px)`;
+
+                // Đổi màu chữ và vòng tròn số
+                stepLinks.forEach((link, idx) => {
+                    const badge = link.querySelector('.step-badge');
+                    if (link === activeLink) {
+                        link.classList.remove('text-slate-300');
+                        link.classList.add('text-white');
+                        badge.className = 'step-badge w-5 h-5 rounded-full bg-white text-indigo-700 flex items-center justify-center text-xs font-bold transition-colors duration-300';
+                    } else {
+                        link.classList.remove('text-white');
+                        link.classList.add('text-slate-300');
+                        const defaultColors = ['bg-indigo-500 text-white', 'bg-emerald-600 text-white', 'bg-amber-500 text-white'];
+                        badge.className = `step-badge w-5 h-5 rounded-full ${defaultColors[idx]} flex items-center justify-center text-xs font-bold transition-colors duration-300`;
+                    }
+                });
+            }
+
+            // Tự động phát hiện người dùng đang tự lăn chuột tới Giai đoạn nào
+            function onScrollUpdate() {
+                // Nếu đang cuộn tự động do bấm nút thì bỏ qua, không kéo ngược khối tím lại
+                if (isClickScrolling) return;
+
+                let detectedStageId = stages[0];
+                const scrollThreshold = window.scrollY + 240;
+
+                stages.forEach(id => {
+                    const section = document.getElementById(id);
+                    if (section && section.offsetTop <= scrollThreshold) {
+                        detectedStageId = id;
+                    }
+                });
+
+                const activeLink = document.querySelector(`.step-link[data-target="${detectedStageId}"]`);
+                movePillTo(activeLink);
+            }
+
+            // Khi bấm trực tiếp vào nút trên thanh điều hướng
+            stepLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    isClickScrolling = true; // Tạm khóa cảm biến cuộn
+                    movePillTo(link);        // Trượt thẳng một mạch sang mục vừa bấm
+
+                    // Mở khóa lại sau khi trang đã cuộn mượt tới nơi (750ms)
+                    clearTimeout(scrollTimeout);
+                    scrollTimeout = setTimeout(() => {
+                        isClickScrolling = false;
+                    }, 750);
+                });
+            });
+
+            // Cập nhật lại vị trí nếu xoay màn hình điện thoại hoặc thu phóng trình duyệt
+            window.addEventListener('resize', () => {
+                currentActiveId = null;
+                onScrollUpdate();
+            });
+
+            window.addEventListener('scroll', onScrollUpdate, { passive: true });
+            setTimeout(onScrollUpdate, 50);
+        });
+    </script>
+
+</html>
