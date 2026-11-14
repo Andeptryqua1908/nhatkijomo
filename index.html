@@ -266,39 +266,41 @@
 
         <!-- GIAI ĐOẠN 3: GHI NHẬT KÝ JOMO QUA GOOGLE FORMS -->
         <section id="stage-3"
-            class="scroll-mt-24 bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-            <div
-                class="bg-amber-50/80 border-b border-amber-100 px-6 py-4 flex items-center justify-between flex-wrap gap-2">
-                <div class="flex items-center gap-3">
-                    <span
-                        class="w-8 h-8 rounded-lg bg-amber-500 text-white font-bold flex items-center justify-center text-sm">3</span>
-                    <div>
-                        <h3 class="font-bold text-slate-900 text-base sm:text-lg">Biểu Mẫu Thu Thập Dữ Liệu Nhật Ký JOMO
-                            & Vượt Cám Dỗ (21h30)</h3>
-                        <p class="text-xs text-slate-500">Gửi số liệu thực nghiệm hằng ngày về hệ thống Google Sheets
-                            của nhóm nghiên cứu</p>
-                    </div>
-                </div>
-                <div class="flex gap-2">
-                    <a href="https://docs.google.com/forms/d/1ZbyY2z1ZjNiKWroZNc3pEHgGVEZsR7yZ5qzfQI-d8wo/viewform"
-                        target="_blank"
-                        class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-3.5 py-2 rounded-lg transition">Form
-                        JOMO ↗</a>
-                    <a href="https://docs.google.com/forms/d/17IxzxMky3wh0fGzGmCC7ga7-dW7HEGQ892WUEDGrz9U/viewform"
-                        target="_blank"
-                        class="bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold px-3.5 py-2 rounded-lg transition">Form
-                        Vượt Cám Dỗ ↗</a>
-                </div>
+    class="scroll-mt-24 bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+    <div
+        class="bg-amber-50/80 border-b border-amber-100 px-6 py-4 flex items-center justify-between flex-wrap gap-2">
+        <div class="flex items-center gap-3">
+            <span
+                class="w-8 h-8 rounded-lg bg-amber-500 text-white font-bold flex items-center justify-center text-sm">3</span>
+            <div>
+                <h3 class="font-bold text-slate-900 text-base sm:text-lg">Biểu Mẫu Thu Thập Dữ Liệu Nhật Ký JOMO
+                    & Vượt Cám Dỗ (21h30)</h3>
+                <p class="text-xs text-slate-500">Gửi số liệu thực nghiệm hằng ngày về hệ thống Google Sheets
+                    của nhóm nghiên cứu</p>
             </div>
+        </div>
+        <div class="flex gap-2">
+            <!-- Đổi target thành "formFrame" và thêm ?embedded=true vào link -->
+            <a href="https://docs.google.com/forms/d/1ZbyY2z1ZjNiKWroZNc3pEHgGVEZsR7yZ5qzfQI-d8wo/viewform?embedded=true"
+                target="formFrame"
+                class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-3.5 py-2 rounded-lg transition">Form JOMO</a>
+            
+            <a href="https://docs.google.com/forms/d/17IxzxMky3wh0fGzGmCC7ga7-dW7HEGQ892WUEDGrz9U/viewform?embedded=true"
+                target="formFrame"
+                class="bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold px-3.5 py-2 rounded-lg transition">Form Vượt Cám Dỗ</a>
+        </div>
+    </div>
 
-            <div class="p-4 sm:p-6">
-                <div class="w-full rounded-xl overflow-hidden border border-slate-200 bg-slate-50">
-                    <iframe
-                        src="https://docs.google.com/forms/d/1ZbyY2z1ZjNiKWroZNc3pEHgGVEZsR7yZ5qzfQI-d8wo/viewform?embedded=true"
-                        class="w-full h-[680px] border-0" loading="lazy">Đang tải biểu mẫu...</iframe>
-                </div>
-            </div>
-        </section>
+    <div class="p-4 sm:p-6">
+        <div class="w-full rounded-xl overflow-hidden border border-slate-200 bg-slate-50">
+            <!-- Đặt tên cho iframe là formFrame -->
+            <iframe
+                name="formFrame"
+                src="https://docs.google.com/forms/d/1ZbyY2z1ZjNiKWroZNc3pEHgGVEZsR7yZ5qzfQI-d8wo/viewform?embedded=true"
+                class="w-full h-[680px] border-0" loading="lazy">Đang tải biểu mẫu...</iframe>
+        </div>
+    </div>
+</section>
 
     </main>
 
